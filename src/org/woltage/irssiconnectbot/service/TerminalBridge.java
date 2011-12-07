@@ -997,10 +997,25 @@ public class TerminalBridge implements VDUDisplay {
 			urlPattern = Pattern.compile(uriRegex);
 		}
 
-		char[] visibleBuffer = new char[buffer.height * buffer.width];
+		// get the effective width of the text area, in case we are in an irssi window with nicklist on the right
+		int effective_width = buffer.width;
+		final int irssi_menubar_color = 5;
+		for (int i = 0; i < buffer.width; i++) {
+			if (((buffer.getAttributes(i, 0) & VDUBuffer.COLOR_BG) >> VDUBuffer.COLOR_BG_SHIFT) != irssi_menubar_color) {
+				if (i != 0 && i < buffer.width-2
+						&& ((buffer.getAttributes(i, 0) & VDUBuffer.COLOR_BG) >> VDUBuffer.COLOR_BG_SHIFT) == 0
+//						&& ((buffer.getAttributes(i, 0) & VDUBuffer.COLOR_FG) >> VDUBuffer.COLOR_FG_SHIFT) == 0
+						&& (buffer.charArray[0][i] == ' ' || buffer.charArray[0][i] == '│')) {
+					effective_width = i;
+				}
+				break;
+			}
+		}
+
+		char[] visibleBuffer = new char[buffer.height * effective_width];
 		for (int l = 0; l < buffer.height; l++)
 			System.arraycopy(buffer.charArray[buffer.windowBase + l], 0,
-					visibleBuffer, l * buffer.width, buffer.width);
+					visibleBuffer, l * effective_width, effective_width);
 
 		Matcher urlMatcher = urlPattern.matcher(new String(visibleBuffer));
 		while (urlMatcher.find())
