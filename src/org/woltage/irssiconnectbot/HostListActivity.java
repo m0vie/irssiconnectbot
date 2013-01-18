@@ -19,7 +19,6 @@ package org.woltage.irssiconnectbot;
 
 import java.util.List;
 
-import com.bugsense.trace.BugSenseHandler;
 import org.woltage.irssiconnectbot.bean.HostBean;
 import org.woltage.irssiconnectbot.service.TerminalBridge;
 import org.woltage.irssiconnectbot.service.TerminalManager;
