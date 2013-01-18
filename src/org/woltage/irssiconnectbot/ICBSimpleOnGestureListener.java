@@ -253,8 +253,6 @@ class ICBSimpleOnGestureListener extends GestureDetector.SimpleOnGestureListener
 							}
 						}
 					});
-			AlertDialog alert = builder.create();
-
 			builder.show();
 		}
 	}
