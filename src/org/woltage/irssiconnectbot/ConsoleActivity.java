@@ -301,15 +301,14 @@ public class ConsoleActivity extends Activity {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // hide action bar if requested by user
-        try {
+        // only do this for HONEYCOMB or later
+        if (!PreferenceConstants.PRE_HONEYCOMB) {
             ActionBar actionBar = getActionBar();
             if (!prefs.getBoolean(PreferenceConstants.ACTIONBAR, true)) {
                 actionBar.hide();
             }
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayOptions(0,ActionBar.DISPLAY_SHOW_TITLE);
-        } catch (NoSuchMethodError error) {
-            Log.w(TAG, "Android sdk version pre 11. Not touching ActionBar.");
         }
 
 
