@@ -242,8 +242,15 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
                 return true;
             }
 
-            // otherwise pass through to existing session
-            // print normal keys
+            // Android keyboard kcm files map ENTER to '\n' (0x0A), which is incorrect.
+            // A keyboard needs to send '\r' (0x0D) when the ENTER button is pressed.
+            // It may be converted to a different end-of-line sequence by a terminal program.
+            // In case KEYCODE_ENTER is sent as-is, many programs will misinterpret the key
+            // as ^J instead of RETURN.
+            // To prevent this, only handle printing characters >= 0x20 (space) here.
+            // KEYCODE_ENTER (0x0A), KEYCODE_SEARCH (0x00), KEYCODE_TAB (0x09) are handled
+            // lateron below, the rest of the escape sequences have already been handled
+            // above as KEYCODE_UNKNOWN.
             if (uchar >= 0x20) {
                 metaState &= ~(META_SLASH | META_TAB);
 
