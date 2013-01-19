@@ -170,7 +170,7 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
                     } else if (keyCode == KeyEvent.KEYCODE_SHIFT_RIGHT
                             && (metaState & META_TAB) != 0) {
                         metaState &= ~(META_TAB | META_TRANSIENT);
-                        bridge.transport.write(0x09);
+                        sendTab();
                         return true;
                     }
                 } else if (PreferenceConstants.KEYBOARDFIX_KEYMODE_LEFT.equals(keymode)) {
@@ -182,7 +182,7 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
                     } else if (keyCode == KeyEvent.KEYCODE_SHIFT_LEFT
                             && (metaState & META_TAB) != 0) {
                         metaState &= ~(META_TAB | META_TRANSIENT);
-                        bridge.transport.write(0x09);
+                        sendTab();
                         return true;
                     }
                 }
@@ -479,7 +479,7 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
                 return true;
             case KeyEvent.KEYCODE_SEARCH:
                 if (PreferenceConstants.KEYBOARDFIX_SEARCH_BUTTON_TAB.equals(searchbutton)) {
-                    bridge.transport.write(0x09);
+                    sendTab();
                 } else if (PreferenceConstants.KEYBOARDFIX_SEARCH_BUTTON_META.equals(searchbutton)) {
                     sendEscape();
                 } else if (PreferenceConstants.KEYBOARDFIX_SEARCH_BUTTON_HARDMETA_SOFTURLSCAN.equals(searchbutton)) {
@@ -493,7 +493,7 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
                 }
                 return true;
             case KeyEvent.KEYCODE_TAB:
-                bridge.transport.write(0x09);
+                sendTab();
                 return true;
             case KEYCODE_PAGE_DOWN:
                 ((vt320)buffer).keyPressed(vt320.KEY_PAGE_DOWN, ' ', getStateForBuffer());
@@ -642,6 +642,10 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
 
     public void sendEscape() {
         ((vt320)buffer).keyTyped(vt320.KEY_ESCAPE, ' ', 0);
+    }
+
+    public void sendTab() {
+        ((vt320) buffer).write(0x09);
     }
 
     /**

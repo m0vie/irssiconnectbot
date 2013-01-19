@@ -445,6 +445,21 @@ public class ConsoleActivity extends Activity {
             }
         });
 
+        final ImageView tabButton = (ImageView) findViewById(R.id.button_tab);
+        tabButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View view) {
+                View flip = findCurrentView(R.id.console_flip);
+                if (flip == null) return;
+                TerminalView terminal = (TerminalView)flip;
+
+                TerminalKeyListener handler = terminal.bridge.getKeyHandler();
+                handler.sendTab();
+                terminal.bridge.tryKeyVibrate();
+
+                keyboardGroup.setVisibility(View.GONE);
+            }
+        });
+
         final ImageView ctrlButton = (ImageView) findViewById(R.id.button_ctrl);
         ctrlButton.setOnClickListener(new OnClickListener() {
             public void onClick(View view) {
@@ -683,6 +698,24 @@ public class ConsoleActivity extends Activity {
             }
         });
 
+        MenuItem tabKey = menu.add("Tab");
+        tabKey.setEnabled(activeTerminal);
+        tabKey.setIcon(R.drawable.button_tab);
+        tabKey.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                View flip = findCurrentView(R.id.console_flip);
+                if (flip == null) return false;
+
+                TerminalView terminal = (TerminalView)flip;
+
+                TerminalKeyListener handler = terminal.bridge.getKeyHandler();
+                handler.sendTab();
+                terminal.bridge.tryKeyVibrate();
+                return true;
+            }
+        });
+
         MenuItem ctrlKey = menu.add("Ctrl");
         ctrlKey.setEnabled(activeTerminal);
         ctrlKey.setIcon(R.drawable.button_ctrl);
@@ -792,6 +825,7 @@ public class ConsoleActivity extends Activity {
         // otherwise they are added to the regular menu
         if (prefs.getBoolean(PreferenceConstants.ACTIONBAR, true)) {
             MenuItemCompat.setShowAsAction(ctrlKey, MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            MenuItemCompat.setShowAsAction(tabKey, MenuItem.SHOW_AS_ACTION_IF_ROOM);
             MenuItemCompat.setShowAsAction(escKey, MenuItem.SHOW_AS_ACTION_IF_ROOM);
             MenuItemCompat.setShowAsAction(symKey, MenuItem.SHOW_AS_ACTION_IF_ROOM);
             MenuItemCompat.setShowAsAction(inputButton, MenuItem.SHOW_AS_ACTION_IF_ROOM);
