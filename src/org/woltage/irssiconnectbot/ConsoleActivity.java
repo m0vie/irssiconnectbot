@@ -19,9 +19,7 @@ package org.woltage.irssiconnectbot;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
 
 import org.woltage.irssiconnectbot.bean.PubkeyBean;
 import org.woltage.irssiconnectbot.bean.SelectionArea;
@@ -80,7 +78,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
-
 import de.mud.terminal.vt320;
 
 public class ConsoleActivity extends Activity {
@@ -689,7 +686,6 @@ public class ConsoleActivity extends Activity {
         MenuItem ctrlKey = menu.add("Ctrl");
         ctrlKey.setEnabled(activeTerminal);
         ctrlKey.setIcon(R.drawable.button_ctrl);
-        MenuItemCompat.setShowAsAction(ctrlKey, MenuItem.SHOW_AS_ACTION_IF_ROOM);
         ctrlKey.setOnMenuItemClickListener(new OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -708,7 +704,6 @@ public class ConsoleActivity extends Activity {
         MenuItem escKey = menu.add("Esc");
         escKey.setEnabled(activeTerminal);
         escKey.setIcon(R.drawable.button_esc);
-        MenuItemCompat.setShowAsAction(escKey, MenuItem.SHOW_AS_ACTION_IF_ROOM);
         escKey.setOnMenuItemClickListener(new OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -727,7 +722,6 @@ public class ConsoleActivity extends Activity {
         MenuItem symKey = menu.add("SYM");
         symKey.setEnabled(activeTerminal);
         symKey.setIcon(R.drawable.button_sym);
-        MenuItemCompat.setShowAsAction(symKey, MenuItem.SHOW_AS_ACTION_IF_ROOM);
         symKey.setOnMenuItemClickListener(new OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -745,7 +739,6 @@ public class ConsoleActivity extends Activity {
         MenuItem inputButton = menu.add("Input");
         inputButton.setEnabled(activeTerminal);
         inputButton.setIcon(R.drawable.button_input);
-        MenuItemCompat.setShowAsAction(inputButton, MenuItem.SHOW_AS_ACTION_IF_ROOM);
         inputButton.setOnMenuItemClickListener(new OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -770,7 +763,6 @@ public class ConsoleActivity extends Activity {
         MenuItem keyboard = menu.add("Show Keyboard");
         keyboard.setEnabled(activeTerminal);
         keyboard.setIcon(R.drawable.button_keyboard);
-        MenuItemCompat.setShowAsAction(keyboard, MenuItem.SHOW_AS_ACTION_IF_ROOM);
         keyboard.setOnMenuItemClickListener(new OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -795,6 +787,16 @@ public class ConsoleActivity extends Activity {
                 return true;
             }
         });
+
+        // show certain menu entries on the action bar, if it is enabled,
+        // otherwise they are added to the regular menu
+        if (prefs.getBoolean(PreferenceConstants.ACTIONBAR, true)) {
+            MenuItemCompat.setShowAsAction(ctrlKey, MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            MenuItemCompat.setShowAsAction(escKey, MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            MenuItemCompat.setShowAsAction(symKey, MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            MenuItemCompat.setShowAsAction(inputButton, MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            MenuItemCompat.setShowAsAction(keyboard, MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        }
 
         return true;
     }
