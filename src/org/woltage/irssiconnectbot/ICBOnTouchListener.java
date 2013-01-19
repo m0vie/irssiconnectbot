@@ -122,15 +122,7 @@ class ICBOnTouchListener implements View.OnTouchListener {
 				keyboardGroup.startAnimation(consoleActivity.keyboard_fade_in);
 				keyboardGroup.setVisibility(View.VISIBLE);
 
-				handler.postDelayed(new Runnable() {
-					public void run() {
-						if (keyboardGroup.getVisibility() == View.GONE)
-							return;
-
-						keyboardGroup.startAnimation(consoleActivity.keyboard_fade_out);
-						keyboardGroup.setVisibility(View.GONE);
-					}
-				}, ConsoleActivity.KEYBOARD_DISPLAY_TIME);
+				consoleActivity.hideKeyboardGroupDelayed();
 			}
 		}
 

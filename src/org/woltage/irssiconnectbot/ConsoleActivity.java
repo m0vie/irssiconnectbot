@@ -132,6 +132,8 @@ public class ConsoleActivity extends Activity {
     private ImageView mKeyboardButton;
     private ImageView mInputButton;
 
+    private RelativeLayout keyboardGroup;
+
     private ServiceConnection connection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             bound = ((TerminalManager.TerminalBinder) service).getService();
@@ -388,7 +390,7 @@ public class ConsoleActivity extends Activity {
 
         inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        final RelativeLayout keyboardGroup = (RelativeLayout) findViewById(R.id.keyboard_group);
+        keyboardGroup = (RelativeLayout) findViewById(R.id.keyboard_group);
 
         if(Build.MODEL.contains("Transformer") &&
                         getResources().getConfiguration().keyboard == Configuration.KEYBOARD_QWERTY &&
@@ -405,7 +407,7 @@ public class ConsoleActivity extends Activity {
                     return;
 
                 inputManager.showSoftInput(flip, InputMethodManager.SHOW_FORCED);
-                keyboardGroup.setVisibility(View.GONE);
+                hideKeyboardGroup();
             }
         });
 
@@ -419,7 +421,7 @@ public class ConsoleActivity extends Activity {
 
                 TerminalKeyListener handler = terminal.bridge.getKeyHandler();
                 handler.showCharPickerDialog(terminal);
-                keyboardGroup.setVisibility(View.GONE);
+                hideKeyboardGroup();
             }
         });
 
@@ -441,7 +443,7 @@ public class ConsoleActivity extends Activity {
                 promptThread.setDaemon(true);
                 promptThread.start();
 
-                keyboardGroup.setVisibility(View.GONE);
+                hideKeyboardGroup();
             }
         });
 
@@ -456,7 +458,7 @@ public class ConsoleActivity extends Activity {
                 handler.sendTab();
                 terminal.bridge.tryKeyVibrate();
 
-                keyboardGroup.setVisibility(View.GONE);
+                hideKeyboardGroup();
             }
         });
 
@@ -471,7 +473,7 @@ public class ConsoleActivity extends Activity {
                 handler.metaPress(TerminalKeyListener.META_CTRL_ON);
                 terminal.bridge.tryKeyVibrate();
 
-                keyboardGroup.setVisibility(View.GONE);
+                hideKeyboardGroup();
             }
         });
 
@@ -485,7 +487,8 @@ public class ConsoleActivity extends Activity {
                 TerminalKeyListener handler = terminal.bridge.getKeyHandler();
                 handler.sendEscape();
                 terminal.bridge.tryKeyVibrate();
-                keyboardGroup.setVisibility(View.GONE);
+
+                hideKeyboardGroup();
             }
         });
 
@@ -496,6 +499,29 @@ public class ConsoleActivity extends Activity {
         flip.setLongClickable(true);
         flip.setOnTouchListener(new ICBOnTouchListener(this, keyboardGroup, detect));
 
+    }
+
+    private Handler hideKeyboardGroupHandler = new Handler();
+
+    private Runnable hideKeyboardGroupRunnable = new Runnable() {
+		public void run() {
+			if (keyboardGroup.getVisibility() == View.GONE)
+				return;
+
+			keyboardGroup.startAnimation(keyboard_fade_out);
+			keyboardGroup.setVisibility(View.GONE);
+		}
+    };
+
+    void hideKeyboardGroupDelayed() {
+        // add the Runnable to the Handler
+        hideKeyboardGroupHandler.postDelayed(hideKeyboardGroupRunnable, KEYBOARD_DISPLAY_TIME);
+    }
+
+    private void hideKeyboardGroup() {
+        // remove the Runnable from the Handler if present
+        hideKeyboardGroupHandler.removeCallbacks(hideKeyboardGroupRunnable);
+        keyboardGroup.setVisibility(View.GONE);
     }
 
     /**
