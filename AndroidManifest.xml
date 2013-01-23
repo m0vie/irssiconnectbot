@@ -75,7 +75,7 @@
                  android:configChanges="keyboardHidden|orientation"
                  android:description="@string/service_desc"/>
 
-        <activity android:name=".ConsoleActivity" android:configChanges="keyboardHidden|orientation"
+        <activity android:name=".ConsoleActivity" android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/NoTitle" android:windowSoftInputMode="stateUnchanged|adjustResize"
                   android:launchMode="singleTop">
             <intent-filter>
