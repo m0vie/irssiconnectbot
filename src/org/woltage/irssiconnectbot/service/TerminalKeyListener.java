@@ -157,6 +157,11 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
             final boolean hardKeyboardHidden = manager.hardKeyboardHidden;
             // Ignore all key-up events except for the special keys
             if (event.getAction() == KeyEvent.ACTION_UP) {
+                // Volume key beeps are fired on key up events. Consume them to mute the beep when resizing
+                if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                    return true;
+                }
+
                 // There's nothing here for virtual keyboard users.
                 if (!hardKeyboard || (hardKeyboard && hardKeyboardHidden))
                     return false;

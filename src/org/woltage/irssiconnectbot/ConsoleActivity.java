@@ -44,7 +44,6 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -316,9 +315,6 @@ public class ConsoleActivity extends Activity {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
-
-        // TODO find proper way to disable volume key beep if it exists.
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         // handle requested console from incoming intent
         requested = getIntent().getData();
@@ -865,8 +861,6 @@ public class ConsoleActivity extends Activity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-        setVolumeControlStream(AudioManager.STREAM_NOTIFICATION);
-
         final View view = findCurrentView(R.id.console_flip);
         boolean activeTerminal = (view instanceof TerminalView);
         boolean sessionOpen = false;
@@ -897,8 +891,6 @@ public class ConsoleActivity extends Activity {
     @Override
     public void onOptionsMenuClosed(Menu menu) {
         super.onOptionsMenuClosed(menu);
-
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
     }
 
     @Override
