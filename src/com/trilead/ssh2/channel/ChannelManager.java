@@ -41,21 +41,21 @@ public class ChannelManager implements MessageHandler
 {
 	private static final Logger log = Logger.getLogger(ChannelManager.class);
 
-	private HashMap x11_magic_cookies = new HashMap();
+	private HashMap<String, X11ServerData> x11_magic_cookies = new HashMap<String, X11ServerData>();
 
 	private TransportManager tm;
 
-	private Vector channels = new Vector();
+	private Vector<Channel> channels = new Vector<Channel>();
 	private int nextLocalChannel = 100;
 	private boolean shutdown = false;
 	private int globalSuccessCounter = 0;
 	private int globalFailedCounter = 0;
 
-	private HashMap remoteForwardings = new HashMap();
+	private HashMap<Integer, RemoteForwardingData> remoteForwardings = new HashMap<Integer, RemoteForwardingData>();
 
 	private AuthAgentCallback authAgent;
 
-	private Vector listenerThreads = new Vector();
+	private Vector<IChannelWorkerThread> listenerThreads = new Vector<IChannelWorkerThread>();
 
 	private boolean listenerThreadsAllowed = true;
 
@@ -71,7 +71,7 @@ public class ChannelManager implements MessageHandler
 		{
 			for (int i = 0; i < channels.size(); i++)
 			{
-				Channel c = (Channel) channels.elementAt(i);
+				Channel c = channels.elementAt(i);
 				if (c.localID == id)
 					return c;
 			}
@@ -85,7 +85,7 @@ public class ChannelManager implements MessageHandler
 		{
 			for (int i = 0; i < channels.size(); i++)
 			{
-				Channel c = (Channel) channels.elementAt(i);
+				Channel c = channels.elementAt(i);
 				if (c.localID == id)
 				{
 					channels.removeElementAt(i);
@@ -224,16 +224,16 @@ public class ChannelManager implements MessageHandler
 		if (log.isEnabled())
 			log.log(50, "Closing all X11 channels for the given fake cookie");
 
-		Vector channel_copy;
+		Vector<Channel> channel_copy;
 
 		synchronized (channels)
 		{
-			channel_copy = (Vector) channels.clone();
+			channel_copy = (Vector<Channel>) channels.clone();
 		}
 
 		for (int i = 0; i < channel_copy.size(); i++)
 		{
-			Channel c = (Channel) channel_copy.elementAt(i);
+			Channel c = channel_copy.elementAt(i);
 
 			synchronized (c)
 			{
@@ -256,7 +256,7 @@ public class ChannelManager implements MessageHandler
 		synchronized (x11_magic_cookies)
 		{
 			if (hexFakeCookie != null)
-				return (X11ServerData) x11_magic_cookies.get(hexFakeCookie);
+				return x11_magic_cookies.get(hexFakeCookie);
 		}
 		return null;
 	}
@@ -266,16 +266,16 @@ public class ChannelManager implements MessageHandler
 		if (log.isEnabled())
 			log.log(50, "Closing all channels");
 
-		Vector channel_copy;
+		Vector<Channel> channel_copy;
 
 		synchronized (channels)
 		{
-			channel_copy = (Vector) channels.clone();
+			channel_copy = (Vector<Channel>) channels.clone();
 		}
 
 		for (int i = 0; i < channel_copy.size(); i++)
 		{
-			Channel c = (Channel) channel_copy.elementAt(i);
+			Channel c = channel_copy.elementAt(i);
 			try
 			{
 				closeChannel(c, "Closing all channels", true);
@@ -455,7 +455,7 @@ public class ChannelManager implements MessageHandler
 		rfd.targetAddress = targetAddress;
 		rfd.targetPort = targetPort;
 
-		Integer key = new Integer(bindPort);
+		Integer key =Integer.valueOf(bindPort);
 
 		synchronized (remoteForwardings)
 		{
@@ -499,11 +499,11 @@ public class ChannelManager implements MessageHandler
 	{
 		RemoteForwardingData rfd = null;
 
-		Integer key = new Integer(bindPort);
+		Integer key = Integer.valueOf(bindPort);
 
 		synchronized (remoteForwardings)
 		{
-			rfd = (RemoteForwardingData) remoteForwardings.get(key);
+			rfd = remoteForwardings.get(key);
 
 			if (rfd == null)
 				throw new IOException("Sorry, there is no known remote forwarding for remote port " + bindPort);
@@ -1306,7 +1306,7 @@ public class ChannelManager implements MessageHandler
 
 			synchronized (remoteForwardings)
 			{
-				rfd = (RemoteForwardingData) remoteForwardings.get(new Integer(remoteConnectedPort));
+				rfd = remoteForwardings.get(Integer.valueOf(remoteConnectedPort));
 			}
 
 			if (rfd == null)
@@ -1408,7 +1408,7 @@ public class ChannelManager implements MessageHandler
 
 			synchronized (c)
 			{
-				c.exit_status = new Integer(exit_status);
+				c.exit_status = Integer.valueOf(exit_status);
 				c.notifyAll();
 			}
 
@@ -1708,7 +1708,7 @@ public class ChannelManager implements MessageHandler
 			{
 				for (int i = 0; i < listenerThreads.size(); i++)
 				{
-					IChannelWorkerThread lat = (IChannelWorkerThread) listenerThreads.elementAt(i);
+					IChannelWorkerThread lat = listenerThreads.elementAt(i);
 					lat.stopWorking();
 				}
 				listenerThreadsAllowed = false;
@@ -1720,7 +1720,7 @@ public class ChannelManager implements MessageHandler
 
 				for (int i = 0; i < channels.size(); i++)
 				{
-					Channel c = (Channel) channels.elementAt(i);
+					Channel c = channels.elementAt(i);
 					synchronized (c)
 					{
 						c.EOF = true;
