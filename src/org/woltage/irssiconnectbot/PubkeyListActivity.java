@@ -49,9 +49,7 @@ import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.text.ClipboardManager;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -175,7 +173,7 @@ public class PubkeyListActivity extends ListActivity implements EventListener {
                         finish();
                     } else {
                         bound.removeKey(pubkey.getNickname());
-                        updateHandler.sendEmptyMessage(-1);
+					    updateList();
                     }
 
 
@@ -282,7 +280,7 @@ public class PubkeyListActivity extends ListActivity implements EventListener {
 			} catch(Exception e) {
 				String message = getResources().getString(R.string.pubkey_failed_add, keybean.getNickname());
 				Log.e(TAG, message, e);
-				Toast.makeText(PubkeyListActivity.this, message, Toast.LENGTH_LONG);
+				Toast.makeText(PubkeyListActivity.this, message, Toast.LENGTH_LONG).show();
 			}
 		} else {
 			// load using internal generated format
@@ -295,7 +293,7 @@ public class PubkeyListActivity extends ListActivity implements EventListener {
 			} catch (Exception e) {
 				String message = getResources().getString(R.string.pubkey_failed_add, keybean.getNickname());
 				Log.e(TAG, message, e);
-				Toast.makeText(PubkeyListActivity.this, message, Toast.LENGTH_LONG);
+				Toast.makeText(PubkeyListActivity.this, message, Toast.LENGTH_LONG).show();
 				return;
 			}
 		}
@@ -309,7 +307,7 @@ public class PubkeyListActivity extends ListActivity implements EventListener {
 		// save this key in memory
 		bound.addKey(keybean, pair, true);
 
-		updateHandler.sendEmptyMessage(-1);
+		updateList();
 	}
 
 	@Override
@@ -332,7 +330,7 @@ public class PubkeyListActivity extends ListActivity implements EventListener {
 			public boolean onMenuItemClick(MenuItem item) {
 				if(loaded) {
 					bound.removeKey(pubkey.getNickname());
-					updateHandler.sendEmptyMessage(-1);
+					updateList();
 				} else {
 					handleAddKey(pubkey);
 					//bound.addKey(nickname, trileadKey);
@@ -350,7 +348,7 @@ public class PubkeyListActivity extends ListActivity implements EventListener {
 				// toggle onstart status
 				pubkey.setStartup(!pubkey.isStartup());
 				pubkeydb.savePubkey(pubkey);
-				updateHandler.sendEmptyMessage(-1);
+				updateList();
 				return true;
 			}
 		});
@@ -424,7 +422,7 @@ public class PubkeyListActivity extends ListActivity implements EventListener {
 										.create().show();
 								else {
 									pubkeydb.savePubkey(pubkey);
-									updateHandler.sendEmptyMessage(-1);
+									updateList();
 								}
 							} catch (Exception e) {
 								Log.e(TAG, "Could not change private key password", e);
@@ -449,7 +447,7 @@ public class PubkeyListActivity extends ListActivity implements EventListener {
 				// toggle confirm use
 				pubkey.setConfirmUse(!pubkey.isConfirmUse());
 				pubkeydb.savePubkey(pubkey);
-				updateHandler.sendEmptyMessage(-1);
+				updateList();
 				return true;
 			}
 		});
@@ -469,7 +467,7 @@ public class PubkeyListActivity extends ListActivity implements EventListener {
 
 							// delete from backend database and update gui
 							pubkeydb.deletePubkey(pubkey);
-							updateHandler.sendEmptyMessage(-1);
+							updateList();
 						}
 					})
 					.setNegativeButton(R.string.delete_neg, null).create().show();
@@ -479,14 +477,6 @@ public class PubkeyListActivity extends ListActivity implements EventListener {
 		});
 
 	}
-
-
-	protected Handler updateHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			updateList();
-		}
-	};
 
 	protected void updateList() {
 		if (pubkeydb == null) return;
@@ -575,7 +565,7 @@ public class PubkeyListActivity extends ListActivity implements EventListener {
 				pubkeydb = new PubkeyDatabase(this);
 			pubkeydb.savePubkey(pubkey);
 
-			updateHandler.sendEmptyMessage(-1);
+			updateList();
 		} catch(Exception e) {
 			Log.e(TAG, "Problem parsing imported private key", e);
 			Toast.makeText(PubkeyListActivity.this, R.string.pubkey_import_parse_problem, Toast.LENGTH_LONG).show();
