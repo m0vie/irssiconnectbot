@@ -999,25 +999,32 @@ public class TerminalBridge implements VDUDisplay {
 
 		// get the effective width of the text area, in case we are in an irssi window with nicklist on the right
 		int effective_width = buffer.width;
-		final int irssi_menubar_color = 5;
-		for (int i = 0; i < buffer.width; i++) {
-			if (((buffer.getAttributes(i, 0) & VDUBuffer.COLOR_BG) >> VDUBuffer.COLOR_BG_SHIFT) != irssi_menubar_color) {
-				if (i != 0 && i < buffer.width-2
-						&& ((buffer.getAttributes(i, 0) & VDUBuffer.COLOR_BG) >> VDUBuffer.COLOR_BG_SHIFT) == 0
-//						&& ((buffer.getAttributes(i, 0) & VDUBuffer.COLOR_FG) >> VDUBuffer.COLOR_FG_SHIFT) == 0
-						&& (buffer.charArray[0][i] == ' ' || buffer.charArray[0][i] == '│')) {
+		for (int i = 1; i < buffer.width; i++) {
+			if (((buffer.getAttributes(i, 1) & VDUBuffer.COLOR_BG) >> VDUBuffer.COLOR_BG_SHIFT) == 0
+					&& (buffer.getChar(i, 1) == '│')) {
+				if (buffer.getChar(i, 0) == '│') { // irssi
 					effective_width = i;
+				} else { // weechat
+					effective_width = i - 1;
 				}
 				break;
 			}
 		}
 
-		char[] visibleBuffer = new char[buffer.height * effective_width];
-		for (int l = 0; l < buffer.height; l++)
-			System.arraycopy(buffer.charArray[buffer.windowBase + l], 0,
-					visibleBuffer, l * effective_width, effective_width);
+		// compile the buffer char array into a large string
+		// to capture wrapped urls as good as possible:
+		// - remove timecodes at the beginning of lines
+		// - if no timecode was found, remove all spaces at the beginning of lines
+		String relevantBuffer = "";
+		for (int l = 0; l < buffer.height; l++) {
+			String line = new String(buffer.charArray[buffer.screenBase + l], 0, effective_width);
+			if ((line = line.replaceFirst("^\\[?\\d\\d:\\d\\d(:\\d\\d)?\\]?\\s", " ")).equals(line)) {
+				line = line.replaceFirst("^ +", "");
+			}
+			relevantBuffer += line;
+		}
 
-		Matcher urlMatcher = urlPattern.matcher(new String(visibleBuffer));
+		Matcher urlMatcher = urlPattern.matcher(relevantBuffer);
 		while (urlMatcher.find())
 			if (!urls.contains(urlMatcher.group()))
 				urls.add(urlMatcher.group());
