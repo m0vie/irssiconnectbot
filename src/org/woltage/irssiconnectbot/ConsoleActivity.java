@@ -489,7 +489,7 @@ public class ConsoleActivity extends Activity {
         });
 
         // detect fling gestures to switch between terminals
-        final GestureDetector detect = new GestureDetector(
+        final GestureDetector detect = new GestureDetector(this,
                 new ICBSimpleOnGestureListener(this));
 
         flip.setLongClickable(true);
