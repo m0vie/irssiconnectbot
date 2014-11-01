@@ -1267,13 +1267,8 @@ public class ConsoleActivity extends Activity {
         Log.d(TAG, "setupPublicKey, pubKey=" + pubkey.getNickname());
 
         try {
-            String openSSHPubkey;
-            if(PubkeyDatabase.KEY_TYPE_IMPORTED.equals(pubkey.getType())) {
-                openSSHPubkey = PubkeyUtils.convertToOpenSSHFormat(new String(pubkey.getPrivateKey()), pubkey.getNickname());
-            } else {
-                PublicKey pk = pubkey.getPublicKey();
-                openSSHPubkey = PubkeyUtils.convertToOpenSSHFormat(pk, pubkey.getNickname());
-            }
+            PublicKey pk = pubkey.getPublicKey();
+            String openSSHPubkey = PubkeyUtils.convertToOpenSSHFormat(pk, pubkey.getNickname());
 
             final TerminalView terminal = (TerminalView) findCurrentView(R.id.console_flip);
             terminal.bridge.injectString("mkdir ~/.ssh -pm 700 ; echo " + openSSHPubkey + " >> ~/.ssh/authorized_keys");

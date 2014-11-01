@@ -63,8 +63,6 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.trilead.ssh2.crypto.PEMDecoder;
-
 /**
  * Manager for SSH connections that runs as a service. This service holds a list
  * of currently connected SSH bridges that are ready for connection up to a GUI
@@ -169,14 +167,9 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 
 		for (PubkeyBean pubkey : pubkeys) {
 			try {
-				Object trileadKey;
-				if(pubkey.getType().equals(PubkeyDatabase.KEY_TYPE_IMPORTED)) {
-					trileadKey = PEMDecoder.decode(new String(pubkey.getPrivateKey()).toCharArray(), null);
-				} else {
-					PrivateKey privKey = PubkeyUtils.decodePrivate(pubkey.getPrivateKey(), pubkey.getType());
-					PublicKey pubKey = pubkey.getPublicKey();
-					trileadKey = PubkeyUtils.convertToTrilead(privKey, pubKey);
-				}
+				PrivateKey privKey = PubkeyUtils.decodePrivate(pubkey.getPrivateKey(), pubkey.getType());
+				PublicKey pubKey = pubkey.getPublicKey();
+				Object trileadKey = PubkeyUtils.convertToTrilead(privKey, pubKey);
 
 				addKey(pubkey, trileadKey);
 			} catch (Exception e) {
@@ -527,10 +520,7 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
             if( loadedKeypairs != null && loadedKeypairs.size() > 0 ) {
                 Collection<String> nicknames = new HashSet<String>(loadedKeypairs.keySet());
                 for( String nickname : nicknames ) {
-                    KeyHolder keyHolder = loadedKeypairs.get(nickname);
-                    if(!keyHolder.bean.isStartup()) {
-                        removeKey(nickname);
-                    }
+                    removeKey(nickname);
                 }
             }
         }

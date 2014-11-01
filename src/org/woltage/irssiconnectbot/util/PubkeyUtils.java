@@ -58,8 +58,6 @@ import javax.crypto.spec.SecretKeySpec;
 import android.util.Log;
 
 import com.trilead.ssh2.crypto.Base64;
-import com.trilead.ssh2.crypto.PEMDecoder;
-import com.trilead.ssh2.crypto.PEMStructure;
 import com.trilead.ssh2.signature.DSASHA1Verify;
 import com.trilead.ssh2.signature.RSASHA1Verify;
 
@@ -231,7 +229,6 @@ public class PubkeyUtils {
 	 * OpenSSH compatibility methods
 	 */
 
-        // native key type
 	public static String convertToOpenSSHFormat(PublicKey pk, String origNickname) throws IOException, InvalidKeyException {
 		String nickname = origNickname;
 		if (nickname == null)
@@ -252,31 +249,9 @@ public class PubkeyUtils {
 		throw new InvalidKeyException("Unknown key type");
 	}
 
-        // imported, pem encoded key
-	public static String convertToOpenSSHFormat(String pk, String origNickname) throws IOException, InvalidKeyException {
-		String nickname = origNickname;
-		if (nickname == null)
-			nickname = "connectbot@android";
-
-                Object trileadKey = PEMDecoder.decode(pk.toCharArray(), null);
-                PEMStructure keyData = PEMDecoder.parsePEM(pk.toCharArray());
-
-		if (keyData.pemType == PEMDecoder.PEM_RSA_PRIVATE_KEY) {
-			com.trilead.ssh2.signature.RSAPrivateKey privateKey = (com.trilead.ssh2.signature.RSAPrivateKey)trileadKey;
-			com.trilead.ssh2.signature.RSAPublicKey publicKey = privateKey.getPublicKey();
-			String data = "ssh-rsa ";
-			data += String.valueOf(Base64.encode(RSASHA1Verify.encodeSSHRSAPublicKey(publicKey)));
-			return data + " " + nickname;
-		} else if (keyData.pemType == PEMDecoder.PEM_DSA_PRIVATE_KEY) {
-			com.trilead.ssh2.signature.DSAPrivateKey privateKey = (com.trilead.ssh2.signature.DSAPrivateKey)trileadKey;
-			com.trilead.ssh2.signature.DSAPublicKey publicKey = privateKey.getPublicKey();
-			String data = "ssh-dss ";
-			data += String.valueOf(Base64.encode(DSASHA1Verify.encodeSSHDSAPublicKey(publicKey)));
-			return data + " " + nickname;
-		}
-
-		throw new InvalidKeyException("Unknown key type");
-	}
+	/*
+	 * OpenSSH compatibility methods
+	 */
 
 	/**
 	 * @param trileadKey
