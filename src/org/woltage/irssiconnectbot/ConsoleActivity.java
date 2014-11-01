@@ -1267,12 +1267,16 @@ public class ConsoleActivity extends Activity {
         Log.d(TAG, "setupPublicKey, pubKey=" + pubkey.getNickname());
 
         try {
-            PublicKey pk = pubkey.getPublicKey();
+            PublicKey pk = PubkeyUtils.decodePublic(pubkey.getPublicKey(), pubkey.getType());
             String openSSHPubkey = PubkeyUtils.convertToOpenSSHFormat(pk, pubkey.getNickname());
 
             final TerminalView terminal = (TerminalView) findCurrentView(R.id.console_flip);
             terminal.bridge.injectString("mkdir ~/.ssh -pm 700 ; echo " + openSSHPubkey + " >> ~/.ssh/authorized_keys");
         } catch (InvalidKeyException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (NoSuchAlgorithmException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (InvalidKeySpecException e) {
             Log.e(TAG, e.getMessage(), e);
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
