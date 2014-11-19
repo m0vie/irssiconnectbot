@@ -1,19 +1,14 @@
-The following binary packages are included:
+The following binaries are included: busybox + mosh
 
-ncurses_5.9-2_arm.ipk            - libncurses library and support files
-mosh_ddrown-git2012.7.10_arm.ipk - mosh client
+They are built using the Android Ports environment.
 
-They are built using the Android Ports environment - http://dan.drown.org/android/
+To rebuild busybox, see http://blog.dan.drown.org/busyboxandroid-build-vm/
+To rebuild mosh (and its libs), see http://blog.dan.drown.org/moshandroid-build-vm/
 
 Their sources come from:
 libngustl-static - android NDK
 ncurses          - https://github.com/ddrown/irssiconnectbot-ncurses
 protobuf         - https://github.com/ddrown/irssiconnectbot-protobuf
-mosh             - https://github.com/ddrown/mosh/tree/android-unicode
-openssl		 - https://github.com/ddrown/irssiconnectbot-openssl
-
-busybox          - http://dan.drown.org/android/src/busybox/
-
-To build a package, setup your build environment (https://github.com/ddrown/android-ports-tools),
-checkout the source you want to rebuild, and run "opkg-buildirssi" in the
-source's directory
+mosh             - https://github.com/ddrown/mosh
+openssl		 - https://github.com/ddrown/openssl
+busybox          - https://github.com/ddrown/busybox

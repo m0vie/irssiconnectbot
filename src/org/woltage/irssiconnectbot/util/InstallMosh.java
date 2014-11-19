@@ -30,13 +30,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
+import android.os.Build;
 
 public final class InstallMosh implements Runnable {
     private File data_dir;
     private File bindir;
     private Context context;
 
-    private final static String BINARY_VERSION = "1.4";
+    private final static String BINARY_VERSION = "1.5";
 
     // using installMessage as the object to lock to access static properties
     private static StringBuilder installMessage = new StringBuilder();
@@ -182,6 +183,17 @@ public final class InstallMosh implements Runnable {
                 installMessage.append("mosh binary install failed/untar: "+e.toString()+"\r\n");
                 return false;
             }
+            try {
+                String binarytype = use_pie() ? "arm.pie" : "arm.nopie";
+                Process ln_s = Runtime.getRuntime().exec(busybox_path.getPath()+" ln -sf "+data_dir+"/bin/mosh-client."+binarytype+" "+data_dir+"/bin/mosh-client");
+                if(ln_s.waitFor() > 0) {
+                    installMessage.append("mosh binary install failed/ln -s: exit status != 0\r\n");
+                    return false;
+                }
+            } catch (Exception e) {
+                installMessage.append("mosh binary install failed/ln -s: "+e.toString()+"\r\n");
+                return false;
+            }
             installMessage.append("mosh-client binary done\r\n");
             Editor edit = prefs.edit();
             edit.putString(PreferenceConstants.INSTALLED_MOSH_VERSION, BINARY_VERSION);
@@ -190,12 +202,24 @@ public final class InstallMosh implements Runnable {
         return true;
     }
 
+    private boolean use_pie() { // use binaries compiled with -fPIE
+        return Build.VERSION.SDK_INT >= 21; // Android Lollipop or later
+    }
+
     private boolean installBusybox() {
+	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String busyboxVersion = prefs.getString(PreferenceConstants.INSTALLED_MOSH_VERSION, "");
+
         File busybox_path = new File(bindir, "busybox");
-        if(!busybox_path.exists()) {
+        if(!busybox_path.exists() || !busyboxVersion.equals(BINARY_VERSION)) {
             installMessage.append("installing busybox binary\r\n");
             try {
-                InputStream busybox = context.getResources().openRawResource(R.raw.busybox);
+                InputStream busybox;
+                if(use_pie()) {
+                  busybox = context.getResources().openRawResource(R.raw.busybox);
+                } else {
+                  busybox = context.getResources().openRawResource(R.raw.busybox_arm_nopie);
+                }
                 FileOutputStream busybox_out = new FileOutputStream(busybox_path.getPath(), false);
                 byte[] buffer = new byte[4096];
                 int num;

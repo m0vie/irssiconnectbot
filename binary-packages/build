@@ -1,0 +1,3 @@
+#!/bin/sh
+
+tar zcf ../res/raw/data.tar.gz.mp3 bin/ share/
