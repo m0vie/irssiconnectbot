@@ -32,11 +32,6 @@ public class PreferenceConstants {
 
 
 	public static final String MEMKEYS = "memkeys";
-	public static final String UPDATE = "update";
-
-	public static final String UPDATE_DAILY = "Daily";
-	public static final String UPDATE_WEEKLY = "Weekly";
-	public static final String UPDATE_NEVER = "Never";
 
 	public static final String LAST_CHECKED = "lastchecked";
 
