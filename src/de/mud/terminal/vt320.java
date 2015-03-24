@@ -160,6 +160,8 @@ public void setScreenSize(int c, int r, boolean broadcast) {
       debugStr.setLength(0);
     }
 
+    setTabs(c, false);
+
     super.setScreenSize(c,r,false);
 
     boolean cursorChanged = false;
@@ -185,6 +187,26 @@ public void setScreenSize(int c, int r, boolean broadcast) {
     }
   }
 
+  /* adjust tabs */
+  private void setTabs(int newWidth, boolean reset) {
+    if (newWidth < 132) newWidth = 132;
+    if (Tabs == null) {
+      reset = true;
+    }
+    if (reset) {
+      Tabs = new byte[newWidth];
+      for (int i = 0; i < newWidth; i += 8) {
+        Tabs[i] = 1;
+      }
+    } else if (newWidth > width) {
+      byte[] tabsNew = new byte[newWidth];
+      System.arraycopy(Tabs, 0, tabsNew, 0, Tabs.length);
+      for (int i = (width + 7) / 8 * 8; i < newWidth; i += 8) {
+        tabsNew[i] = 1;
+      }
+      Tabs = tabsNew;
+    }
+  }
 
   /**
    * Create a new vt320 terminal and intialize it with useful settings.
@@ -3006,12 +3028,7 @@ public void setScreenSize(int c, int r, boolean broadcast) {
     onegl = -1; // Single shift override
 
     /* reset tabs */
-    int nw = width;
-    if (nw < 132) nw = 132;
-    Tabs = new byte[nw];
-    for (int i = 0; i < nw; i += 8) {
-      Tabs[i] = 1;
-    }
+    setTabs(width, true);
 
     deleteArea(0, 0, width, height, attributes);
     setMargins(0, height);
