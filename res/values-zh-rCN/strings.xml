@@ -79,8 +79,6 @@
   <string name="pref_fullscreen_summary">处于控制台时隐藏状态栏</string>
   <string name="pref_memkeys_title">在内存中记录密钥</string>
   <string name="pref_memkeys_summary">保存解锁密匙在内存中，直到后端服务停止为止</string>
-  <string name="pref_update_title">升级检查</string>
-  <string name="pref_update_summary">设置检查ConnectBot最新版本的最大频率</string>
   <string name="pref_conn_persist_title">保持联机</string>
   <string name="pref_conn_persist_summary">强制并保持连接在后台</string>
   <string name="pref_keymode_title">目录快捷键</string>
@@ -104,9 +102,6 @@
   <string name="list_keymode_none">禁用</string>
   <string name="list_pubkeyids_none">不使用密匙</string>
   <string name="list_pubkeyids_any">使用解锁密匙</string>
-  <string name="list_update_daily">每日</string>
-  <string name="list_update_weekly">每周</string>
-  <string name="list_update_never">从不</string>
   <string name="hostpref_nickname_title">昵称</string>
   <string name="hostpref_color_title">颜色类型</string>
   <string name="hostpref_fontsize_title">字型大小 (pt)</string>

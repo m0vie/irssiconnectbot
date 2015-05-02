@@ -19,6 +19,7 @@ package org.woltage.irssiconnectbot.service;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Arrays;
@@ -62,8 +63,6 @@ import android.os.Message;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
-
-import com.trilead.ssh2.crypto.PEMDecoder;
 
 /**
  * Manager for SSH connections that runs as a service. This service holds a list
@@ -169,16 +168,11 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 
 		for (PubkeyBean pubkey : pubkeys) {
 			try {
-				Object trileadKey;
-				if(pubkey.getType().equals(PubkeyDatabase.KEY_TYPE_IMPORTED)) {
-					trileadKey = PEMDecoder.decode(new String(pubkey.getPrivateKey()).toCharArray(), null);
-				} else {
-					PrivateKey privKey = PubkeyUtils.decodePrivate(pubkey.getPrivateKey(), pubkey.getType());
-					PublicKey pubKey = pubkey.getPublicKey();
-					trileadKey = PubkeyUtils.convertToTrilead(privKey, pubKey);
-				}
+				PrivateKey privKey = PubkeyUtils.decodePrivate(pubkey.getPrivateKey(), pubkey.getType());
+				PublicKey pubKey = PubkeyUtils.decodePublic(pubkey.getPublicKey(), pubkey.getType());
+				KeyPair pair = new KeyPair(pubKey, privKey);
 
-				addKey(pubkey, trileadKey);
+				addKey(pubkey, pair);
 			} catch (Exception e) {
 				Log.d(TAG, String.format("Problem adding key '%s' to in-memory cache", pubkey.getNickname()), e);
 			}
@@ -410,21 +404,21 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 		return loadedKeypairs.containsKey(nickname);
 	}
 
-	public void addKey(PubkeyBean pubkey, Object trileadKey) {
-		addKey(pubkey, trileadKey, false);
+	public void addKey(PubkeyBean pubkey, KeyPair pair) {
+		addKey(pubkey, pair, false);
 	}
 
-	public void addKey(PubkeyBean pubkey, Object trileadKey, boolean force) {
+	public void addKey(PubkeyBean pubkey, KeyPair pair, boolean force) {
 		if (!savingKeys && !force)
 			return;
 
 		removeKey(pubkey.getNickname());
 
-		byte[] sshPubKey = PubkeyUtils.extractOpenSSHPublic(trileadKey);
+		byte[] sshPubKey = PubkeyUtils.extractOpenSSHPublic(pair);
 
 		KeyHolder keyHolder = new KeyHolder();
 		keyHolder.bean = pubkey;
-		keyHolder.trileadKey = trileadKey;
+		keyHolder.pair = pair;
 		keyHolder.openSSHPubkey = sshPubKey;
 
 		loadedKeypairs.put(pubkey.getNickname(), keyHolder);
@@ -464,18 +458,18 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 			return false;
 	}
 
-	public Object getKey(String nickname) {
+	public KeyPair getKey(String nickname) {
 		if (loadedKeypairs.containsKey(nickname)) {
 			KeyHolder keyHolder = loadedKeypairs.get(nickname);
-			return keyHolder.trileadKey;
+			return keyHolder.pair;
 		} else
 			return null;
 	}
 
-	public Object getKey(byte[] publicKey) {
+	public KeyPair getKey(byte[] publicKey) {
 		for (KeyHolder keyHolder : loadedKeypairs.values()) {
 			if (Arrays.equals(keyHolder.openSSHPubkey, publicKey))
-				return keyHolder.trileadKey;
+				return keyHolder.pair;
 		}
 		return null;
 	}
@@ -527,10 +521,7 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
             if( loadedKeypairs != null && loadedKeypairs.size() > 0 ) {
                 Collection<String> nicknames = new HashSet<String>(loadedKeypairs.keySet());
                 for( String nickname : nicknames ) {
-                    KeyHolder keyHolder = loadedKeypairs.get(nickname);
-                    if(!keyHolder.bean.isStartup()) {
-                        removeKey(nickname);
-                    }
+                    removeKey(nickname);
                 }
             }
         }
@@ -730,7 +721,7 @@ public class TerminalManager extends Service implements BridgeDisconnectedListen
 
 	public static class KeyHolder {
 		public PubkeyBean bean;
-		public Object trileadKey;
+		public KeyPair pair;
 		public byte[] openSSHPubkey;
 	}
 

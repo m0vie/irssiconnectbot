@@ -17,8 +17,6 @@
 
 package org.woltage.irssiconnectbot;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
 import java.security.PublicKey;
 
 import org.woltage.irssiconnectbot.bean.PubkeyBean;
@@ -1267,19 +1265,12 @@ public class ConsoleActivity extends Activity {
         Log.d(TAG, "setupPublicKey, pubKey=" + pubkey.getNickname());
 
         try {
-            String openSSHPubkey;
-            if(PubkeyDatabase.KEY_TYPE_IMPORTED.equals(pubkey.getType())) {
-                openSSHPubkey = PubkeyUtils.convertToOpenSSHFormat(new String(pubkey.getPrivateKey()), pubkey.getNickname());
-            } else {
-                PublicKey pk = pubkey.getPublicKey();
-                openSSHPubkey = PubkeyUtils.convertToOpenSSHFormat(pk, pubkey.getNickname());
-            }
+            PublicKey pk = PubkeyUtils.decodePublic(pubkey.getPublicKey(), pubkey.getType());
+            String openSSHPubkey = PubkeyUtils.convertToOpenSSHFormat(pk, pubkey.getNickname());
 
             final TerminalView terminal = (TerminalView) findCurrentView(R.id.console_flip);
             terminal.bridge.injectString("mkdir ~/.ssh -pm 700 ; echo " + openSSHPubkey + " >> ~/.ssh/authorized_keys");
-        } catch (InvalidKeyException e) {
-            Log.e(TAG, e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
         }
 

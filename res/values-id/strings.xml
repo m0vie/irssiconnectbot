@@ -73,8 +73,6 @@
   <string name="pref_fullscreen_summary">Sembunyikan bar status ketika dalam konsol</string>
   <string name="pref_memkeys_title">Ingat kunci dalam memori</string>
   <string name="pref_memkeys_summary">Jaga kunci tidak terkunci dalam memori ketika backend service berakhir</string>
-  <string name="pref_update_title">Perbarui pemeriksaan</string>
-  <string name="pref_update_summary">Set frekuensi maksimal untuk memeriksa untuk memperbarui ConnectBot</string>
   <string name="pref_keymode_title">Direktori jalan pintas</string>
   <string name="pref_keymode_summary">Pilih bagaimana menggunakan Alt untuk \'/\' dan Shift untuk Tab</string>
   <string name="pref_camera_title">Jalan pintas kamera</string>
@@ -90,9 +88,6 @@
   <string name="list_keymode_none">Tidak aktif</string>
   <string name="list_pubkeyids_none">Jangan gunakan tombol</string>
   <string name="list_pubkeyids_any">Gunakan tombol apapun yang tidak terkunci</string>
-  <string name="list_update_daily">Setiap hari</string>
-  <string name="list_update_weekly">Setiap minggu</string>
-  <string name="list_update_never">Tidak pernah</string>
   <string name="hostpref_nickname_title">Nama panggilan</string>
   <string name="hostpref_color_title">Kategori warna</string>
   <string name="hostpref_pubkeyid_title">Gunakan otentifikasi pubkey</string>
