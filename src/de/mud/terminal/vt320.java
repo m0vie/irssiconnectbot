@@ -160,7 +160,7 @@ public void setScreenSize(int c, int r, boolean broadcast) {
       debugStr.setLength(0);
     }
 
-    setTabs(c, false);
+    setTabs(c);
 
     super.setScreenSize(c,r,false);
 
@@ -188,23 +188,10 @@ public void setScreenSize(int c, int r, boolean broadcast) {
   }
 
   /* adjust tabs */
-  private void setTabs(int newWidth, boolean reset) {
-    if (newWidth < 132) newWidth = 132;
-    if (Tabs == null) {
-      reset = true;
-    }
-    if (reset) {
-      Tabs = new byte[newWidth];
-      for (int i = 0; i < newWidth; i += 8) {
-        Tabs[i] = 1;
-      }
-    } else if (newWidth > width) {
-      byte[] tabsNew = new byte[newWidth];
-      System.arraycopy(Tabs, 0, tabsNew, 0, Tabs.length);
-      for (int i = (width + 7) / 8 * 8; i < newWidth; i += 8) {
-        tabsNew[i] = 1;
-      }
-      Tabs = tabsNew;
+  private void setTabs(int newWidth) {
+    Tabs = new byte[newWidth];
+    for (int i = 0; i < newWidth; i += 8) {
+      Tabs[i] = 1;
     }
   }
 
@@ -3028,7 +3015,7 @@ public void setScreenSize(int c, int r, boolean broadcast) {
     onegl = -1; // Single shift override
 
     /* reset tabs */
-    setTabs(width, true);
+    setTabs(width);
 
     deleteArea(0, 0, width, height, attributes);
     setMargins(0, height);
